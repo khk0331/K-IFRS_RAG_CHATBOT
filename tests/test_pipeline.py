@@ -4,7 +4,7 @@ import unittest
 from pathlib import Path
 
 from kifrs_rag.guardrails import mask_sensitive_data, validate_question
-from kifrs_rag.hybrid_retrieval import BM25Retriever, expand_query
+from kifrs_rag.hybrid_retrieval import BM25Retriever, STANDARD_HINTS, expand_query
 from kifrs_rag.generation import (
     GenerationError,
     GenerationResult,
@@ -62,6 +62,14 @@ class PipelineTests(unittest.TestCase):
         ]
         scores = BM25Retriever(chunks).scores("리스 사용권자산 최초인식")
         self.assertGreater(scores[0], scores[1])
+
+    def test_routes_cash_generating_unit_to_impairment_standard(self):
+        question = "현금흐름창출단위의 손상은 어떻게 하나요?"
+        matches = [(term, standard) for term, standard in STANDARD_HINTS.items() if term in question]
+        longest = max(len(term) for term, _ in matches)
+        routed = {standard for term, standard in matches if len(term) == longest}
+        self.assertEqual(routed, {"K-IFRS 1036"})
+        self.assertIn("회수가능액", expand_query(question))
 
     def test_loader_rejects_duplicate_paragraphs(self):
         item = {
