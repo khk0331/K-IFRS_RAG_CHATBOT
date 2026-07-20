@@ -40,14 +40,18 @@ def validate_generation(result: GenerationResult, evidence_count: int) -> None:
 
 
 class ExtractiveGenerator:
-    """Safe offline baseline that copies the highest-ranked evidence."""
+    """Safe offline baseline that copies up to two highest-ranked evidence passages."""
 
     def generate(self, question: str, evidence: list[SearchResult]) -> GenerationResult:
-        del question
-        lead = evidence[0].chunk
+        compound = any(marker in question for marker in (",", "과 ", "및", "각각", "후속"))
+        selected = evidence[: 2 if compound else 1]
+        answer = "\n\n".join(
+            f"{item.chunk.text} ({item.chunk.standard_id} 문단 {item.chunk.paragraph_id})"
+            for item in selected
+        )
         return GenerationResult(
-            answer=f"{lead.text} ({lead.standard_id} 문단 {lead.paragraph_id})",
-            evidence_indices=(0,),
+            answer=answer,
+            evidence_indices=tuple(range(len(selected))),
         )
 
 

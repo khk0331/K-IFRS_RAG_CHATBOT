@@ -55,7 +55,7 @@ form.addEventListener("submit", async (event) => {
     const payload = await response.json();
     if (!response.ok) throw new Error(payload.detail || "요청을 처리하지 못했습니다.");
     if (payload.status === "answered") {
-      showMessage("검증 완료", payload.answer, payload);
+      showMessage("인용 검증 완료", payload.answer, payload);
     } else if (payload.status === "insufficient_evidence") {
       showMessage("근거 부족", "질문에 답할 수 있는 충분한 기준서 근거를 찾지 못했습니다.", payload);
     } else {

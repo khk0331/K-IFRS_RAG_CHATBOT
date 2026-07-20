@@ -4,6 +4,7 @@ import unittest
 from pathlib import Path
 
 from kifrs_rag.guardrails import mask_sensitive_data, validate_question
+from kifrs_rag.hybrid_retrieval import BM25Retriever, expand_query
 from kifrs_rag.generation import (
     GenerationError,
     GenerationResult,
@@ -50,6 +51,17 @@ class PipelineTests(unittest.TestCase):
             "담당자 test@example.com, 010-1234-5678, 900101-1234567, 1234-5678-9012-3456"
         )
         self.assertEqual(masked, "담당자 [EMAIL], [PHONE], [RRN], [CARD]")
+
+    def test_expands_inventory_measurement_intent_for_sparse_search(self):
+        expanded = expand_query("재고자산의 최초인식과 기말 후속측정")
+        self.assertIn("취득원가", expanded)
+        self.assertIn("순실현가능가치", expanded)
+        chunks = [
+            self.service.retriever._chunks[0],
+            self.service.retriever._chunks[1],
+        ]
+        scores = BM25Retriever(chunks).scores("리스 사용권자산 최초인식")
+        self.assertGreater(scores[0], scores[1])
 
     def test_loader_rejects_duplicate_paragraphs(self):
         item = {

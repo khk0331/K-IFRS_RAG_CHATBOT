@@ -63,11 +63,18 @@ class DenseRetriever:
         self._model = SentenceTransformer(manifest["model"])
         self._model.max_seq_length = manifest.get("max_seq_length", 256)
 
-    def search(self, question: str, top_k: int = 3) -> list[SearchResult]:
+    @property
+    def chunks(self) -> list[Chunk]:
+        return self._chunks
+
+    def score_all(self, question: str):
         query = self._model.encode(
             [f"query: {question}"], normalize_embeddings=True, convert_to_numpy=True
         )[0]
-        scores = self._vectors @ query
+        return self._vectors @ query
+
+    def search(self, question: str, top_k: int = 3) -> list[SearchResult]:
+        scores = self.score_all(question)
         count = min(top_k, len(self._chunks))
         indices = self._np.argpartition(scores, -count)[-count:]
         ranked = indices[self._np.argsort(scores[indices])[::-1]]

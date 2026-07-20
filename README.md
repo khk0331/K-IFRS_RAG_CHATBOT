@@ -59,18 +59,18 @@ PYTHONPATH=src python scripts/ingest_pdfs.py data/private/pdfs
 pip install -e '.[semantic]'
 PYTHONPATH=src python scripts/build_index.py
 
-KIFRS_RETRIEVER=dense \
+KIFRS_RETRIEVER=hybrid \
 KIFRS_INDEX_PATH=data/index/e5-small \
 uvicorn kifrs_rag.api:app --reload
 ```
 
-기본 임베딩 모델은 `intfloat/multilingual-e5-small`이며 질의와 문서를 구분해 인코딩합니다. 밀집 검색은 최고 유사도가 기본 임계값 `0.86`보다 낮으면 답변을 보류합니다. 임계값은 실제 평가 데이터로 다시 조정할 수 있습니다.
+기본 임베딩 모델은 `intfloat/multilingual-e5-small`이며 질의와 문서를 구분해 인코딩합니다. 실제 문서 모드는 Dense 임베딩과 BM25 후보를 결합한 뒤 기준서 주제, 질문 의도 및 특수 적용범위를 반영해 재순위화합니다. 하이브리드 점수가 기본 임계값 `0.75`보다 낮으면 답변을 보류합니다.
 
-밀집 검색 평가 명령:
+하이브리드 검색 평가 명령:
 
 ```bash
 PYTHONPATH=src python scripts/evaluate.py \
-  --retriever dense \
+  --retriever hybrid \
   --evals evals/dense_smoke.jsonl \
   --top-k 5 \
   --min-score 0.86
@@ -112,8 +112,8 @@ uvicorn kifrs_rag.api:app --reload
 ## 동작 방식
 
 ```text
-K-IFRS 문서 → 파싱 및 청킹 → 임베딩 → 검색 인덱스 저장
-사용자 질문 → 관련 문단 검색 → 근거 확인 → 답변 생성 → 인용 검증
+K-IFRS 문서 → 파싱 및 청킹 → 임베딩·BM25 검색 준비
+사용자 질문 → Dense·BM25 후보 검색 → 재순위화 → 답변 생성 → 인용 검증
 ```
 
 문서는 기준서, 장·절, 문단 구조를 최대한 유지해 처리합니다. 각 검색 결과에는 기준서 번호, 문단 번호, 제목, 시행일, 출처 등의 메타데이터가 포함됩니다.
