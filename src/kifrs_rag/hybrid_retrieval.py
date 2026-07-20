@@ -12,9 +12,11 @@ QUERY_EXPANSIONS = {
     "후속측정": ("순실현가능가치", "장부금액", "감액", "재평가"),
     "후속 측정": ("순실현가능가치", "장부금액", "감액", "재평가"),
     "기말": ("순실현가능가치", "보고기간말", "장부금액"),
+    "손상": ("회수가능액", "장부금액", "손상차손", "감액"),
 }
 
 STANDARD_HINTS = {
+    "현금흐름창출단위": "K-IFRS 1036",
     "재고자산": "K-IFRS 1002",
     "현금흐름": "K-IFRS 1007",
     "법인세": "K-IFRS 1012",
@@ -108,8 +110,12 @@ class HybridRetriever:
         sparse_ranks = self._ranks(sparse_scores, self.candidate_k)
         candidates = dense_ranks.keys() | sparse_ranks.keys()
         max_sparse = max((sparse_scores[index] for index in candidates), default=1.0) or 1.0
+        matched_hints = [
+            (term, standard) for term, standard in STANDARD_HINTS.items() if term in question
+        ]
+        longest_hint = max((len(term) for term, _ in matched_hints), default=0)
         hinted_standards = {
-            standard for term, standard in STANDARD_HINTS.items() if term in question
+            standard for term, standard in matched_hints if len(term) == longest_hint
         }
 
         ranked: list[tuple[float, float, int]] = []
