@@ -1,0 +1,27 @@
+[
+  {
+    "standard_id": "SAMPLE-1116",
+    "paragraph_id": "23",
+    "title": "사용권자산의 최초 측정",
+    "effective_date": "2024-01-01",
+    "source": "synthetic://sample-1116/23",
+    "text": "리스이용자는 개시일에 사용권자산을 원가로 측정한다. 이 원가에는 리스부채의 최초 측정금액과 개시일 이전 지급액 등이 포함된다."
+  },
+  {
+    "standard_id": "SAMPLE-1109",
+    "paragraph_id": "5.1.1",
+    "title": "금융자산의 최초 측정",
+    "effective_date": "2024-01-01",
+    "source": "synthetic://sample-1109/5.1.1",
+    "text": "금융자산은 최초 인식할 때 공정가치로 측정하며 특정 경우 거래원가를 가감한다."
+  },
+  {
+    "standard_id": "SAMPLE-1016",
+    "paragraph_id": "30",
+    "title": "원가모형",
+    "effective_date": "2024-01-01",
+    "source": "synthetic://sample-1016/30",
+    "text": "자산으로 인식한 유형자산은 원가에서 감가상각누계액과 손상차손누계액을 차감한 금액으로 장부금액을 표시한다."
+  }
+]
+
