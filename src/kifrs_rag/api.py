@@ -65,12 +65,31 @@ def _build_service() -> RagService:
         generator = None
     else:
         raise ValueError(f"unsupported generator: {generator_name}")
-    return RagService(
+    service = RagService(
         retriever,
         min_score=float(os.getenv("KIFRS_MIN_SCORE", default_min_score)),
         top_k=int(os.getenv("KIFRS_TOP_K", "3")),
         generator=generator,
     )
+    if os.getenv("KIFRS_HARNESS", "local") == "openai":
+        from .openai_harness import OpenAIRagHarness, OpenAIStructuredClient, UsageLedger
+
+        ledger = UsageLedger(
+            os.getenv("KIFRS_OPENAI_LEDGER", "data/private/openai_usage.json"),
+            float(os.getenv("KIFRS_OPENAI_BUDGET_USD", "3.0")),
+        )
+        client = OpenAIStructuredClient(
+            os.environ["OPENAI_API_KEY"],
+            ledger,
+            os.getenv("OPENAI_BASE_URL", "https://api.openai.com/v1"),
+        )
+        return OpenAIRagHarness(
+            retriever,
+            client,
+            os.getenv("KIFRS_PLANNER_MODEL", "gpt-5-nano"),
+            os.getenv("KIFRS_ANSWER_MODEL", "gpt-5.6-luna"),
+        )
+    return service
 
 
 app = FastAPI(title="K-IFRS RAG", version="0.1.0")

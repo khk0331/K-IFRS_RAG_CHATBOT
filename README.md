@@ -110,6 +110,22 @@ uvicorn kifrs_rag.api:app --reload
 
 외부 생성 모델을 사용하면 질문과 검색된 기준서 일부가 해당 제공자에게 전송됩니다. 문서 이용 권한과 제공자의 데이터 보관·학습 정책을 확인한 후 활성화해야 합니다.
 
+### GPT 질의 계획·근거 선택
+
+GPT가 질문을 분해하고 광범위 검색 후보 중 직접 관련된 문단을 선택한 후 답변하도록 실행할 수 있습니다.
+
+```bash
+OPENAI_API_KEY=replace-me \
+KIFRS_RETRIEVER=hybrid \
+KIFRS_HARNESS=openai \
+KIFRS_OPENAI_BUDGET_USD=3.0 \
+uvicorn kifrs_rag.api:app --reload
+```
+
+기본 플래너는 `gpt-5-nano`, 답변 모델은 `gpt-5.6-luna`입니다. 누적 예상비용이 설정된 한도에 도달하면 추가 호출을 차단합니다. 사용량은 Git에서 제외된 `data/private/openai_usage.json`에 기록하며 API 키는 저장하지 않습니다.
+
+플래너는 자체 건설자산과 고객 건설계약처럼 질문만으로 회계처리를 확정할 수 없는 경우 바로 답하지 않고 추가 정보를 요청합니다. 답변은 검색 근거에서 선택한 문단만 별도 인용하며, 제공된 PDF에 현행 적용 기준서가 없으면 자료 범위를 명시합니다.
+
 ## 주요 기능
 
 - 자연어로 K-IFRS 관련 질문 입력

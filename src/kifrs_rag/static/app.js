@@ -58,6 +58,10 @@ form.addEventListener("submit", async (event) => {
       showMessage("인용 검증 완료", payload.answer, payload);
     } else if (payload.status === "insufficient_evidence") {
       showMessage("근거 부족", "질문에 답할 수 있는 충분한 기준서 근거를 찾지 못했습니다.", payload);
+    } else if (payload.status === "clarification_required") {
+      showMessage("추가 정보 필요", payload.answer, payload);
+    } else if (payload.status === "budget_exceeded") {
+      showMessage("API 예산 한도", "설정된 OpenAI API 사용 한도에 도달했습니다.", payload);
     } else {
       showMessage("검증 실패", "생성된 답변의 근거를 검증하지 못해 반환하지 않았습니다.", payload);
     }

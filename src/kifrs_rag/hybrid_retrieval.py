@@ -160,6 +160,12 @@ class HybridRetriever:
         return {int(index): rank for rank, index in enumerate(ranked, 1)}
 
     def search(self, question: str, top_k: int = 3) -> list[SearchResult]:
+        return self._search(question, top_k, use_routing=True)
+
+    def search_broad(self, question: str, top_k: int = 12) -> list[SearchResult]:
+        return self._search(question, top_k, use_routing=False)
+
+    def _search(self, question: str, top_k: int, use_routing: bool) -> list[SearchResult]:
         import numpy as np
 
         initial = has_initial_intent(question)
@@ -168,7 +174,7 @@ class HybridRetriever:
         sparse_scores = np.asarray(self.sparse.scores(question), dtype="float32")
         matched_hints = [
             (term, standard) for term, standard in STANDARD_HINTS.items() if term in question
-        ]
+        ] if use_routing else []
         longest_hint = max((len(term) for term, _ in matched_hints), default=0)
         hinted_standards = {
             standard for term, standard in matched_hints if len(term) == longest_hint
