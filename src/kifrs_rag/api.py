@@ -25,11 +25,20 @@ def get_service() -> RagService:
         from .dense_retrieval import DenseRetriever
 
         retriever = DenseRetriever(os.getenv("KIFRS_INDEX_PATH", "data/index/e5-small"))
+    elif retriever_name == "hybrid":
+        from .hybrid_retrieval import HybridRetriever
+
+        retriever = HybridRetriever(os.getenv("KIFRS_INDEX_PATH", "data/index/e5-small"))
     elif retriever_name == "local":
         retriever = LocalRetriever(load_chunks(path))
     else:
         raise ValueError(f"unsupported retriever: {retriever_name}")
-    default_min_score = "0.86" if retriever_name == "dense" else "0.18"
+    if retriever_name == "dense":
+        default_min_score = "0.86"
+    elif retriever_name == "hybrid":
+        default_min_score = "0.75"
+    else:
+        default_min_score = "0.18"
     generator_name = os.getenv("KIFRS_GENERATOR", "extractive")
     if generator_name == "openai_compatible":
         from .generation import OpenAICompatibleGenerator
