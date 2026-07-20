@@ -2,13 +2,19 @@ from uuid import uuid4
 
 from .generation import ExtractiveGenerator, Generator
 from .guardrails import citations_are_valid, sufficient_evidence, validate_question
-from .retrieval import LocalRetriever
+from typing import Protocol
+
+from .models import SearchResult
+
+
+class Retriever(Protocol):
+    def search(self, question: str, top_k: int = 3) -> list[SearchResult]: ...
 
 
 class RagService:
     def __init__(
         self,
-        retriever: LocalRetriever,
+        retriever: Retriever,
         min_score: float = 0.18,
         top_k: int = 3,
         generator: Generator | None = None,

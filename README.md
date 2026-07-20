@@ -45,10 +45,27 @@ PYTHONPATH=src python scripts/ingest_pdfs.py data/private/pdfs
 실제 문서로 API를 실행하려면 환경변수를 지정합니다.
 
 ```bash
-KIFRS_DATA_PATH=data/private/standards.json uvicorn kifrs_rag.api:app --reload
+pip install -e '.[semantic]'
+PYTHONPATH=src python scripts/build_index.py
+
+KIFRS_RETRIEVER=dense \
+KIFRS_INDEX_PATH=data/index/e5-small \
+uvicorn kifrs_rag.api:app --reload
 ```
 
-`data/private/`의 PDF, 추출 원문, 검사 결과와 인덱스는 Git에 포함되지 않습니다.
+기본 임베딩 모델은 `intfloat/multilingual-e5-small`이며 질의와 문서를 구분해 인코딩합니다. 밀집 검색은 최고 유사도가 기본 임계값 `0.86`보다 낮으면 답변을 보류합니다. 임계값은 실제 평가 데이터로 다시 조정할 수 있습니다.
+
+밀집 검색 평가 명령:
+
+```bash
+PYTHONPATH=src python scripts/evaluate.py \
+  --retriever dense \
+  --evals evals/dense_smoke.jsonl \
+  --top-k 5 \
+  --min-score 0.86
+```
+
+`data/private/`의 PDF·추출 원문·검사 결과와 `data/index/`의 벡터 인덱스는 Git에 포함되지 않습니다.
 
 ## 주요 기능
 
