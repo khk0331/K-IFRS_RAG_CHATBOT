@@ -7,6 +7,12 @@ from kifrs_rag.guardrails import validate_question
 from kifrs_rag.evaluation import evaluate, load_cases
 from kifrs_rag.ingestion import load_chunks
 from kifrs_rag.retrieval import LocalRetriever
+from kifrs_rag.pdf_ingestion import (
+    _join_wrapped_lines,
+    _split_long_text,
+    metadata_from_filename,
+    parse_page_lines,
+)
 from kifrs_rag.service import RagService
 
 
@@ -44,13 +50,43 @@ class PipelineTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "duplicate.json"
             path.write_text(json.dumps([item, item]), encoding="utf-8")
-            with self.assertRaisesRegex(ValueError, "duplicate paragraph"):
+            with self.assertRaisesRegex(ValueError, "duplicate paragraph chunk"):
                 load_chunks(path)
 
     def test_evaluation_baseline(self):
         metrics = evaluate(self.service, load_cases("evals/baseline.jsonl"))
         self.assertEqual(metrics["recall_at_3"], 1.0)
         self.assertEqual(metrics["answerability_accuracy"], 1.0)
+
+    def test_parses_layout_paragraphs(self):
+        lines = [
+            "44   리스이용자는 다음 조건을 모두 충족한다.",
+            "     추가 설명을 이어서 기록한다.",
+            "     - 20 -",
+            "45   다음 문단의 내용이다.",
+        ]
+        self.assertEqual(
+            parse_page_lines(lines),
+            [
+                ("44", "리스이용자는 다음 조건을 모두 충족한다. 추가 설명을 이어서 기록한다."),
+                ("45", "다음 문단의 내용이다."),
+            ],
+        )
+
+    def test_extracts_standard_metadata_from_filename(self):
+        path = Path("시행중_K-IFRS_제1116호_리스(2023_개정_반영).pdf")
+        self.assertEqual(metadata_from_filename(path), ("K-IFRS 1116", "리스", "2023"))
+
+    def test_repairs_korean_word_splits_at_line_wraps(self):
+        self.assertEqual(_join_wrapped_lines(["아니라면 문", "단 42를 적용한다."]), "아니라면 문단 42를 적용한다.")
+        self.assertEqual(_join_wrapped_lines(["별도 리스", "로 회계처리한다."]), "별도 리스로 회계처리한다.")
+        self.assertEqual(_join_wrapped_lines(["할 수", "있는 경우"]), "할 수 있는 경우")
+
+    def test_splits_long_paragraph_with_overlap(self):
+        text = " ".join(["회계기준"] * 600)
+        parts = _split_long_text(text, max_chars=500, overlap=50)
+        self.assertGreater(len(parts), 1)
+        self.assertTrue(all(len(part) <= 500 for part in parts))
 
 
 if __name__ == "__main__":

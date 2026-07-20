@@ -29,6 +29,27 @@ PYTHONPATH=src python scripts/evaluate.py
 
 결과에는 Recall@K, MRR, 답변 가능 여부 정확도가 포함됩니다.
 
+## K-IFRS PDF 등록
+
+한국회계기준원에서 직접 내려받은 PDF를 `data/private/pdfs/`에 저장한 후 다음 명령을 실행합니다.
+
+```bash
+PYTHONPATH=src python scripts/audit_pdfs.py data/private/pdfs \
+  --output data/private/pdf_audit.json
+
+PYTHONPATH=src python scripts/ingest_pdfs.py data/private/pdfs
+```
+
+첫 번째 명령은 파일 손상, 암호화, 중복 및 텍스트 추출 가능 여부를 검사합니다. 두 번째 명령은 기준서와 문단 구조를 보존한 `data/private/standards.json`을 생성합니다.
+
+실제 문서로 API를 실행하려면 환경변수를 지정합니다.
+
+```bash
+KIFRS_DATA_PATH=data/private/standards.json uvicorn kifrs_rag.api:app --reload
+```
+
+`data/private/`의 PDF, 추출 원문, 검사 결과와 인덱스는 Git에 포함되지 않습니다.
+
 ## 주요 기능
 
 - 자연어로 K-IFRS 관련 질문 입력

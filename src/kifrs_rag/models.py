@@ -9,10 +9,10 @@ class Chunk:
     effective_date: str
     source: str
     text: str
+    chunk_index: int = 0
 
 
 @dataclass(frozen=True, slots=True)
 class SearchResult:
     chunk: Chunk
     score: float
-
