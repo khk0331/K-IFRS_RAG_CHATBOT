@@ -6,4 +6,4 @@ __pycache__/
 *.py[cod]
 data/private/
 data/index/
-
+tmp/
