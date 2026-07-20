@@ -34,8 +34,8 @@ class PipelineTests(unittest.TestCase):
     def test_returns_grounded_answer_with_valid_citation(self):
         result = self.service.query("리스 사용권자산의 최초 측정은 어떻게 하나요?")
         self.assertEqual(result["status"], "answered")
-        self.assertEqual(result["citations"][0]["standard_id"], "SAMPLE-1116")
-        self.assertEqual(result["citations"][0]["paragraph_id"], "23")
+        self.assertEqual(result["citations"][0]["standard_id"], "DEMO-LEASE")
+        self.assertEqual(result["citations"][0]["paragraph_id"], "D23")
 
     def test_refuses_when_evidence_is_missing(self):
         result = self.service.query("화성 탐사선의 연료는 무엇인가요?")

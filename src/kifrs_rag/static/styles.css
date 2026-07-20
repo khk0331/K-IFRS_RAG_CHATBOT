@@ -58,6 +58,9 @@ textarea::placeholder { color: var(--moss-subtle); }
 button { background: var(--moss-paper); color: #11180F; border: 1px solid rgba(216,255,100,.34); border-radius: 8px; padding: 12px 18px; font: inherit; font-weight: 760; cursor: pointer; }
 button:hover { background: var(--moss-lime); border-color: var(--moss-lime); }
 button:disabled { opacity: .55; cursor: wait; }
+.example-row { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 10px; }
+.example-question { padding: 7px 10px; background: rgba(216,255,100,.07); color: var(--moss-lime); border-color: rgba(216,255,100,.25); border-radius: 999px; font-size: 12px; font-weight: 650; }
+.example-question:hover { color: #11180F; }
 .result-grid { display: grid; grid-template-columns: minmax(0,1.15fr) minmax(330px,.85fr); gap: 14px; }
 .answer-text { white-space: pre-wrap; font-size: 17px; line-height: 1.8; }
 .citation-list { display: grid; gap: 10px; }

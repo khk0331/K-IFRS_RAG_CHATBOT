@@ -7,6 +7,31 @@ const answerStatus = document.querySelector("#answer-status");
 const systemStatus = document.querySelector("#system-status");
 const citations = document.querySelector("#citations");
 const trace = document.querySelector("#trace-id");
+const modeChip = document.querySelector("#mode-chip");
+const chunkCount = document.querySelector("#chunk-count");
+const vectorSize = document.querySelector("#vector-size");
+const threshold = document.querySelector("#threshold");
+const modeDescription = document.querySelector("#mode-description");
+
+fetch("/v1/meta")
+  .then((response) => response.json())
+  .then((meta) => {
+    modeChip.textContent = meta.mode === "demo" ? `Demo · ${meta.standards} Topics` : `${meta.standards} Standards`;
+    chunkCount.textContent = Number(meta.chunks).toLocaleString();
+    vectorSize.textContent = meta.vector;
+    threshold.textContent = meta.threshold;
+    modeDescription.textContent = meta.mode === "demo"
+      ? "합성 문단으로 검색·재순위화·인용 검증을 체험하는 공개 데모입니다."
+      : "근거가 충분하지 않으면 답변을 생성하지 않습니다.";
+  })
+  .catch(() => {});
+
+document.querySelectorAll(".example-question").forEach((example) => {
+  example.addEventListener("click", () => {
+    question.value = example.textContent;
+    question.focus();
+  });
+});
 
 function addCitation(item) {
   const card = document.createElement("article");

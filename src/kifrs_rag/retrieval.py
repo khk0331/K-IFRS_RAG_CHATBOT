@@ -37,9 +37,40 @@ class LocalRetriever:
         self._vectors = [Counter(tokenize(f"{c.title} {c.text}")) for c in chunks]
 
     def search(self, question: str, top_k: int = 3) -> list[SearchResult]:
-        query = Counter(tokenize(question))
         scored = [
-            SearchResult(chunk=chunk, score=_cosine(query, vector))
-            for chunk, vector in zip(self._chunks, self._vectors, strict=True)
+            SearchResult(chunk=chunk, score=score)
+            for chunk, score in zip(self._chunks, self.score_all(question), strict=True)
         ]
         return sorted(scored, key=lambda result: result.score, reverse=True)[:top_k]
+
+    def score_all(self, question: str) -> list[float]:
+        query = Counter(tokenize(question))
+        return [_cosine(query, vector) for vector in self._vectors]
+
+
+class DemoHybridRetriever:
+    """Dependency-free hybrid retriever for the public synthetic demo."""
+
+    def __init__(self, chunks: list[Chunk]):
+        from .hybrid_retrieval import BM25Retriever
+
+        self._chunks = chunks
+        self._vector = LocalRetriever(chunks)
+        self._bm25 = BM25Retriever(chunks)
+
+    def search(self, question: str, top_k: int = 3) -> list[SearchResult]:
+        vector_scores = self._vector.score_all(question)
+        keyword_scores = self._bm25.scores(question)
+        max_keyword = max(keyword_scores, default=1.0) or 1.0
+        question_tokens = set(tokenize(question))
+        results: list[SearchResult] = []
+        for index, chunk in enumerate(self._chunks):
+            title_overlap = len(question_tokens & set(tokenize(chunk.title)))
+            rerank_bonus = min(title_overlap * 0.035, 0.14)
+            score = (
+                0.58 * vector_scores[index]
+                + 0.32 * keyword_scores[index] / max_keyword
+                + rerank_bonus
+            )
+            results.append(SearchResult(chunk=chunk, score=min(score, 1.0)))
+        return sorted(results, key=lambda result: result.score, reverse=True)[:top_k]

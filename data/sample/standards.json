@@ -1,27 +1,66 @@
 [
   {
-    "standard_id": "SAMPLE-1116",
-    "paragraph_id": "23",
+    "standard_id": "DEMO-LEASE",
+    "paragraph_id": "D23",
     "title": "사용권자산의 최초 측정",
-    "effective_date": "2024-01-01",
-    "source": "synthetic://sample-1116/23",
-    "text": "리스이용자는 개시일에 사용권자산을 원가로 측정한다. 이 원가에는 리스부채의 최초 측정금액과 개시일 이전 지급액 등이 포함된다."
+    "effective_date": "DEMO",
+    "source": "synthetic://demo/lease/D23",
+    "text": "데모 원칙: 리스 이용자는 계약 개시일에 사용권자산을 원가로 측정한다. 원가에는 리스부채의 최초 측정액, 개시일 이전 지급액에서 받은 인센티브를 차감한 금액, 직접원가와 복구원가 추정액을 포함한다."
   },
   {
-    "standard_id": "SAMPLE-1109",
-    "paragraph_id": "5.1.1",
-    "title": "금융자산의 최초 측정",
-    "effective_date": "2024-01-01",
-    "source": "synthetic://sample-1109/5.1.1",
-    "text": "금융자산은 최초 인식할 때 공정가치로 측정하며 특정 경우 거래원가를 가감한다."
+    "standard_id": "DEMO-LEASE",
+    "paragraph_id": "D29",
+    "title": "사용권자산의 후속 측정",
+    "effective_date": "DEMO",
+    "source": "synthetic://demo/lease/D29",
+    "text": "데모 원칙: 계약 개시일 후 사용권자산은 일반적으로 원가에서 감가상각누계액과 손상차손누계액을 차감하고 리스부채 재측정에 따른 조정액을 반영하여 측정한다."
   },
   {
-    "standard_id": "SAMPLE-1016",
-    "paragraph_id": "30",
-    "title": "원가모형",
-    "effective_date": "2024-01-01",
-    "source": "synthetic://sample-1016/30",
-    "text": "자산으로 인식한 유형자산은 원가에서 감가상각누계액과 손상차손누계액을 차감한 금액으로 장부금액을 표시한다."
+    "standard_id": "DEMO-INVENTORY",
+    "paragraph_id": "D10",
+    "title": "재고자산의 원가",
+    "effective_date": "DEMO",
+    "source": "synthetic://demo/inventory/D10",
+    "text": "데모 원칙: 재고자산의 원가는 매입원가, 전환원가와 재고자산을 현재 장소와 상태에 이르게 하는 데 발생한 기타 원가를 포함한다."
+  },
+  {
+    "standard_id": "DEMO-INVENTORY",
+    "paragraph_id": "D28",
+    "title": "재고자산의 후속 측정",
+    "effective_date": "DEMO",
+    "source": "synthetic://demo/inventory/D28",
+    "text": "데모 원칙: 재고자산의 원가가 회수되지 못할 것으로 예상되면 순실현가능가치로 감액한다. 이후 순실현가능가치가 상승하면 최초 감액 범위에서 환입한다."
+  },
+  {
+    "standard_id": "DEMO-IMPAIRMENT",
+    "paragraph_id": "D18",
+    "title": "현금흐름창출단위의 손상",
+    "effective_date": "DEMO",
+    "source": "synthetic://demo/impairment/D18",
+    "text": "데모 원칙: 개별 자산의 회수가능액을 추정할 수 없으면 그 자산이 속한 현금흐름창출단위의 회수가능액을 산정한다. 장부금액이 회수가능액을 초과하는 금액을 손상차손으로 인식한다."
+  },
+  {
+    "standard_id": "DEMO-REVENUE",
+    "paragraph_id": "D35",
+    "title": "기간에 걸친 수익 인식",
+    "effective_date": "DEMO",
+    "source": "synthetic://demo/revenue/D35",
+    "text": "데모 원칙: 고객이 기업의 수행으로 제공되는 효익을 동시에 얻고 소비하는 등 기간 인식 요건을 충족하면 수행의무의 진행률을 측정하여 수익을 기간에 걸쳐 인식한다. 요건을 충족하지 않으면 한 시점에 인식한다."
+  },
+  {
+    "standard_id": "DEMO-PROVISION",
+    "paragraph_id": "D14",
+    "title": "충당부채의 인식",
+    "effective_date": "DEMO",
+    "source": "synthetic://demo/provision/D14",
+    "text": "데모 원칙: 과거 사건으로 현재의무가 존재하고, 의무 이행에 경제적 효익을 가진 자원의 유출 가능성이 높으며, 금액을 신뢰성 있게 추정할 수 있을 때 충당부채를 인식한다."
+  },
+  {
+    "standard_id": "DEMO-ASSOCIATE",
+    "paragraph_id": "D25",
+    "title": "관계기업 지분 일부 처분",
+    "effective_date": "DEMO",
+    "source": "synthetic://demo/associate/D25",
+    "text": "데모 원칙: 일부 지분을 처분한 후에도 유의적인 영향력을 유지하면 지분법 적용을 계속한다. 관련 자산이나 부채의 처분 시 당기손익으로 재분류되는 기타포괄손익은 처분 지분에 해당하는 비례적 부분을 재분류한다."
   }
 ]
-
