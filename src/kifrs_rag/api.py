@@ -1,7 +1,10 @@
 import os
 from functools import lru_cache
+from pathlib import Path
 
 from fastapi import FastAPI, HTTPException
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
 from .ingestion import load_chunks
@@ -48,6 +51,13 @@ def get_service() -> RagService:
 
 
 app = FastAPI(title="K-IFRS RAG", version="0.1.0")
+STATIC_DIR = Path(__file__).with_name("static")
+app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
+
+
+@app.get("/", include_in_schema=False)
+def home() -> FileResponse:
+    return FileResponse(STATIC_DIR / "index.html")
 
 
 @app.get("/health")
