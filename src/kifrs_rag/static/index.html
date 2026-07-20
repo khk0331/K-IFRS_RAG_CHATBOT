@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="K-IFRS 기준서 근거 기반 질의응답">
+  <title>K-IFRS RAG Chatbot</title>
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+  <main class="shell">
+    <header class="intro-band">
+      <section>
+        <div class="system-kicker">Grounded accounting intelligence</div>
+        <h1>K-IFRS RAG Chatbot</h1>
+        <p class="hero-copy">회계기준서에서 관련 문단을 찾고, 검증된 근거 안에서만 답변합니다.</p>
+        <div class="chip-row" aria-label="서비스 특성">
+          <span class="reference-chip">51 Standards</span>
+          <span class="reference-chip">Paragraph Retrieval</span>
+          <span class="reference-chip">Citation Verified</span>
+        </div>
+      </section>
+      <aside class="scope-panel">
+        <div class="scope-topline"><span>Retrieval system</span><span class="online-dot">Ready</span></div>
+        <div class="scope-grid">
+          <div class="scope-metric"><strong>14,548</strong><span>검색 청크</span></div>
+          <div class="scope-metric"><strong>384D</strong><span>밀집 벡터</span></div>
+          <div class="scope-metric"><strong>0.86</strong><span>근거 임계값</span></div>
+        </div>
+        <p>근거가 충분하지 않으면 답변을 생성하지 않습니다.</p>
+      </aside>
+    </header>
+
+    <section class="workspace" aria-labelledby="question-title">
+      <div class="panel-head">
+        <div><span class="eyebrow">Ask the standards</span><h2 id="question-title">회계기준 질문</h2></div>
+        <span class="moss-badge" id="system-status">근거 검색 준비</span>
+      </div>
+      <form id="query-form">
+        <label for="question">질문</label>
+        <textarea id="question" name="question" maxlength="1000" rows="4" placeholder="예: 리스의 사용권자산은 최초에 어떻게 측정하나요?" required></textarea>
+        <div class="form-foot">
+          <p>회사 기밀이나 개인정보는 입력하지 마세요.</p>
+          <button type="submit" id="submit-button">기준서 검색</button>
+        </div>
+      </form>
+    </section>
+
+    <section id="result" class="result-grid" hidden aria-live="polite">
+      <article class="answer-panel">
+        <div class="panel-head compact">
+          <div><span class="eyebrow">Grounded answer</span><h2>답변</h2></div>
+          <span class="moss-badge" id="answer-status">검증 완료</span>
+        </div>
+        <p id="answer-text" class="answer-text"></p>
+        <p id="trace-id" class="trace"></p>
+      </article>
+      <aside class="evidence-panel">
+        <div class="panel-head compact"><div><span class="eyebrow">Evidence</span><h2>근거 문단</h2></div></div>
+        <div id="citations" class="citation-list"></div>
+      </aside>
+    </section>
+
+    <footer>본 서비스는 회계·감사·법률 자문을 대체하지 않습니다. 중요한 판단에는 최신 공식 기준서를 확인하세요.</footer>
+  </main>
+  <script src="/static/app.js" defer></script>
+</body>
+</html>
