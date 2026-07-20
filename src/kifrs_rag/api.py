@@ -9,7 +9,7 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
 from .ingestion import load_chunks
-from .retrieval import LocalRetriever
+from .retrieval import DemoHybridRetriever, LocalRetriever
 from .service import RagService
 
 
@@ -33,7 +33,7 @@ def get_service() -> RagService:
 
 def _build_service() -> RagService:
     path = os.getenv("KIFRS_DATA_PATH", "data/sample/standards.json")
-    retriever_name = os.getenv("KIFRS_RETRIEVER", "local")
+    retriever_name = os.getenv("KIFRS_RETRIEVER", "demo")
     if retriever_name == "dense":
         from .dense_retrieval import DenseRetriever
 
@@ -42,6 +42,8 @@ def _build_service() -> RagService:
         from .hybrid_retrieval import HybridRetriever
 
         retriever = HybridRetriever(os.getenv("KIFRS_INDEX_PATH", "data/index/e5-small"))
+    elif retriever_name == "demo":
+        retriever = DemoHybridRetriever(load_chunks(path))
     elif retriever_name == "local":
         retriever = LocalRetriever(load_chunks(path))
     else:
@@ -50,6 +52,8 @@ def _build_service() -> RagService:
         default_min_score = "0.86"
     elif retriever_name == "hybrid":
         default_min_score = "0.75"
+    elif retriever_name == "demo":
+        default_min_score = "0.24"
     else:
         default_min_score = "0.18"
     generator_name = os.getenv("KIFRS_GENERATOR", "extractive")
@@ -119,6 +123,19 @@ def home() -> FileResponse:
 @app.get("/health")
 def health() -> dict[str, str]:
     return {"status": "ok"}
+
+
+@app.get("/v1/meta")
+def metadata() -> dict:
+    retriever = os.getenv("KIFRS_RETRIEVER", "demo")
+    demo = retriever == "demo"
+    return {
+        "mode": "demo" if demo else "production",
+        "standards": 6 if demo else int(os.getenv("KIFRS_STANDARD_COUNT", "51")),
+        "chunks": 8 if demo else int(os.getenv("KIFRS_CHUNK_COUNT", "14548")),
+        "vector": "Local" if demo else "384D",
+        "threshold": os.getenv("KIFRS_MIN_SCORE", "0.24" if demo else "0.75"),
+    }
 
 
 @app.post("/v1/query")

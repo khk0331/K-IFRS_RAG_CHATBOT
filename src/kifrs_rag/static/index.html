@@ -15,7 +15,7 @@
         <h1>K-IFRS RAG Chatbot</h1>
         <p class="hero-copy">회계기준서에서 관련 문단을 찾고, 검증된 근거 안에서만 답변합니다.</p>
         <div class="chip-row" aria-label="서비스 특성">
-          <span class="reference-chip">51 Standards</span>
+          <span class="reference-chip" id="mode-chip">Demo Mode</span>
           <span class="reference-chip">Paragraph Retrieval</span>
           <span class="reference-chip">Citation Verified</span>
         </div>
@@ -23,11 +23,11 @@
       <aside class="scope-panel">
         <div class="scope-topline"><span>Retrieval system</span><span class="online-dot">Ready</span></div>
         <div class="scope-grid">
-          <div class="scope-metric"><strong>14,548</strong><span>검색 청크</span></div>
-          <div class="scope-metric"><strong>384D</strong><span>밀집 벡터</span></div>
-          <div class="scope-metric"><strong>0.86</strong><span>근거 임계값</span></div>
+          <div class="scope-metric"><strong id="chunk-count">8</strong><span>검색 청크</span></div>
+          <div class="scope-metric"><strong id="vector-size">Local</strong><span>벡터 검색</span></div>
+          <div class="scope-metric"><strong id="threshold">0.24</strong><span>근거 임계값</span></div>
         </div>
-        <p>근거가 충분하지 않으면 답변을 생성하지 않습니다.</p>
+        <p id="mode-description">공개 데모는 저작권 문제가 없는 합성 문단으로 동작합니다.</p>
       </aside>
     </header>
 
@@ -39,6 +39,11 @@
       <form id="query-form">
         <label for="question">질문</label>
         <textarea id="question" name="question" maxlength="1000" rows="4" placeholder="예: 리스의 사용권자산은 최초에 어떻게 측정하나요?" required></textarea>
+        <div class="example-row" aria-label="데모 질문">
+          <button type="button" class="example-question">사용권자산의 최초 측정은?</button>
+          <button type="button" class="example-question">현금흐름창출단위의 손상은?</button>
+          <button type="button" class="example-question">충당부채는 언제 인식하나요?</button>
+        </div>
         <div class="form-foot">
           <p>회사 기밀이나 개인정보는 입력하지 마세요.</p>
           <button type="submit" id="submit-button">기준서 검색</button>
