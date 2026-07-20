@@ -1,6 +1,11 @@
 from uuid import uuid4
 
-from .generation import ExtractiveGenerator, Generator
+from .generation import (
+    ExtractiveGenerator,
+    GenerationError,
+    Generator,
+    validate_generation,
+)
 from .guardrails import citations_are_valid, sufficient_evidence, validate_question
 from typing import Protocol
 
@@ -40,7 +45,17 @@ class RagService:
         if not citations_are_valid(grounded):
             return {"status": "validation_failed", "answer": None, "citations": [], "trace_id": trace_id}
 
-        answer = self.generator.generate(clean, grounded)
+        try:
+            generation = self.generator.generate(clean, grounded)
+            validate_generation(generation, len(grounded))
+        except GenerationError:
+            return {
+                "status": "validation_failed",
+                "answer": None,
+                "citations": [],
+                "trace_id": trace_id,
+            }
+        cited_results = [grounded[index] for index in generation.evidence_indices]
         citations = [
             {
                 "standard_id": result.chunk.standard_id,
@@ -49,6 +64,11 @@ class RagService:
                 "score": round(result.score, 4),
                 "source": result.chunk.source,
             }
-            for result in grounded
+            for result in cited_results
         ]
-        return {"status": "answered", "answer": answer, "citations": citations, "trace_id": trace_id}
+        return {
+            "status": "answered",
+            "answer": generation.answer,
+            "citations": citations,
+            "trace_id": trace_id,
+        }

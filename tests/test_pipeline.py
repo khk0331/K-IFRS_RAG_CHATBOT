@@ -4,6 +4,11 @@ import unittest
 from pathlib import Path
 
 from kifrs_rag.guardrails import validate_question
+from kifrs_rag.generation import (
+    GenerationError,
+    GenerationResult,
+    OpenAICompatibleGenerator,
+)
 from kifrs_rag.evaluation import evaluate, load_cases
 from kifrs_rag.ingestion import load_chunks
 from kifrs_rag.retrieval import LocalRetriever
@@ -87,6 +92,30 @@ class PipelineTests(unittest.TestCase):
         parts = _split_long_text(text, max_chars=500, overlap=50)
         self.assertGreater(len(parts), 1)
         self.assertTrue(all(len(part) <= 500 for part in parts))
+
+    def test_blocks_generator_citing_unknown_evidence(self):
+        class InvalidGenerator:
+            def generate(self, question, evidence):
+                return GenerationResult("근거 없는 답변", (99,))
+
+        service = RagService(
+            LocalRetriever(load_chunks("data/sample/standards.json")),
+            min_score=0.18,
+            generator=InvalidGenerator(),
+        )
+        result = service.query("리스 사용권자산의 최초 측정은 어떻게 하나요?")
+        self.assertEqual(result["status"], "validation_failed")
+        self.assertEqual(result["citations"], [])
+
+    def test_parses_only_known_structured_evidence_ids(self):
+        result = OpenAICompatibleGenerator._parse(
+            '{"answer":"근거 기반 답변", "evidence_ids":["E1"]}', 2
+        )
+        self.assertEqual(result, GenerationResult("근거 기반 답변", (0,)))
+        with self.assertRaises(GenerationError):
+            OpenAICompatibleGenerator._parse(
+                '{"answer":"잘못된 답변", "evidence_ids":["E3"]}', 2
+            )
 
 
 if __name__ == "__main__":
