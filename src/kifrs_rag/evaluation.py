@@ -27,10 +27,11 @@ def load_cases(path: str | Path) -> list[EvalCase]:
     return cases
 
 
-def evaluate(service: RagService, cases: list[EvalCase]) -> dict:
+def evaluate(service: RagService, cases: list[EvalCase], include_details: bool = False) -> dict:
     retrieval_hits = 0
     reciprocal_rank_sum = 0.0
     answerability_hits = 0
+    details = []
 
     for case in cases:
         results = service.retriever.search(case.question, service.top_k)
@@ -50,9 +51,25 @@ def evaluate(service: RagService, cases: list[EvalCase]) -> dict:
         response = service.query(case.question)
         predicted_answerable = response["status"] == "answered"
         answerability_hits += predicted_answerable == case.answerable
+        if include_details:
+            details.append(
+                {
+                    "question": case.question,
+                    "expected": expected,
+                    "predicted_answerable": predicted_answerable,
+                    "results": [
+                        {
+                            "standard_id": result.chunk.standard_id,
+                            "paragraph_id": result.chunk.paragraph_id,
+                            "score": round(result.score, 4),
+                        }
+                        for result in results
+                    ],
+                }
+            )
 
     answerable_count = sum(case.answerable for case in cases)
-    return {
+    metrics = {
         "cases": len(cases),
         f"recall_at_{service.top_k}": round(
             retrieval_hits / answerable_count if answerable_count else 0.0, 4
@@ -60,4 +77,6 @@ def evaluate(service: RagService, cases: list[EvalCase]) -> dict:
         "mrr": round(reciprocal_rank_sum / answerable_count if answerable_count else 0.0, 4),
         "answerability_accuracy": round(answerability_hits / len(cases), 4),
     }
-
+    if include_details:
+        metrics["details"] = details
+    return metrics

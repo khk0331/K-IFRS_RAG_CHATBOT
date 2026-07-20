@@ -16,10 +16,19 @@ class QueryRequest(BaseModel):
 @lru_cache
 def get_service() -> RagService:
     path = os.getenv("KIFRS_DATA_PATH", "data/sample/standards.json")
-    chunks = load_chunks(path)
+    retriever_name = os.getenv("KIFRS_RETRIEVER", "local")
+    if retriever_name == "dense":
+        from .dense_retrieval import DenseRetriever
+
+        retriever = DenseRetriever(os.getenv("KIFRS_INDEX_PATH", "data/index/e5-small"))
+    elif retriever_name == "local":
+        retriever = LocalRetriever(load_chunks(path))
+    else:
+        raise ValueError(f"unsupported retriever: {retriever_name}")
+    default_min_score = "0.86" if retriever_name == "dense" else "0.18"
     return RagService(
-        LocalRetriever(chunks),
-        min_score=float(os.getenv("KIFRS_MIN_SCORE", "0.18")),
+        retriever,
+        min_score=float(os.getenv("KIFRS_MIN_SCORE", default_min_score)),
         top_k=int(os.getenv("KIFRS_TOP_K", "3")),
     )
 
@@ -38,4 +47,3 @@ def query(payload: QueryRequest) -> dict:
         return get_service().query(payload.question)
     except ValueError as error:
         raise HTTPException(status_code=400, detail=str(error)) from error
-
