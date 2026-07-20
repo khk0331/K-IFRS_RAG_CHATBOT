@@ -5,6 +5,8 @@ from pathlib import Path
 
 from kifrs_rag.guardrails import mask_sensitive_data, validate_question
 from kifrs_rag.hybrid_retrieval import BM25Retriever, STANDARD_HINTS, expand_query
+from kifrs_rag.models import Chunk, SearchResult
+from kifrs_rag.openai_harness import BudgetExceeded, OpenAIRagHarness, UsageLedger
 from kifrs_rag.generation import (
     GenerationError,
     GenerationResult,
@@ -76,6 +78,41 @@ class PipelineTests(unittest.TestCase):
         self.assertIn("원가모형", expanded)
         self.assertIn("감가상각", expanded)
         self.assertNotIn("순실현가능가치", expanded)
+
+    def test_openai_harness_uses_only_model_selected_evidence(self):
+        evidence = SearchResult(
+            Chunk("K-IFRS 1039", "89", "금융상품", "2020", "test://89", "공정가치위험회피 회계처리"),
+            0.9,
+        )
+
+        class FakeRetriever:
+            def search_broad(self, question, top_k):
+                return [evidence]
+
+        class FakeClient:
+            calls = 0
+
+            def request(self, **kwargs):
+                self.calls += 1
+                if self.calls == 1:
+                    return {
+                        "search_queries": ["공정가치위험회피 회계처리"],
+                        "accounting_topics": ["위험회피회계"],
+                        "needs_clarification": False,
+                        "clarification_question": "",
+                    }
+                return {"answer": "근거 기반 답변 【E1】", "evidence_ids": ["E1"]}
+
+        result = OpenAIRagHarness(FakeRetriever(), FakeClient()).query("공정가치위험회피회계 설명")
+        self.assertEqual(result["status"], "answered")
+        self.assertEqual(result["answer"], "근거 기반 답변")
+        self.assertEqual(result["citations"][0]["paragraph_id"], "89")
+
+    def test_openai_budget_guard_blocks_overspend(self):
+        with tempfile.TemporaryDirectory() as directory:
+            ledger = UsageLedger(Path(directory) / "usage.json", budget_usd=0.001)
+            with self.assertRaises(BudgetExceeded):
+                ledger.ensure_available(0.002)
 
     def test_loader_rejects_duplicate_paragraphs(self):
         item = {
