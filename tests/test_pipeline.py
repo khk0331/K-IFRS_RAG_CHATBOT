@@ -71,6 +71,12 @@ class PipelineTests(unittest.TestCase):
         self.assertEqual(routed, {"K-IFRS 1036"})
         self.assertIn("회수가능액", expand_query(question))
 
+    def test_scopes_measurement_expansion_to_the_accounting_topic(self):
+        expanded = expand_query("사용권자산의 최초 인식과 후속측정은?")
+        self.assertIn("원가모형", expanded)
+        self.assertIn("감가상각", expanded)
+        self.assertNotIn("순실현가능가치", expanded)
+
     def test_loader_rejects_duplicate_paragraphs(self):
         item = {
             "standard_id": "SAMPLE",

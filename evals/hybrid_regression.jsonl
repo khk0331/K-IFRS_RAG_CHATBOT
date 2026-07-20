@@ -1,0 +1,12 @@
+{"question":"사용권자산의 최초 인식과 후속측정은?","answerable":true,"expected_standard_id":"K-IFRS 1116","expected_paragraph_id":"23"}
+{"question":"재고자산의 최초인식과 기말 후속측정 방식은?","answerable":true,"expected_standard_id":"K-IFRS 1002","expected_paragraph_id":"9"}
+{"question":"현금흐름창출단위의 손상은 어떤 방식으로 이루어지나요?","answerable":true,"expected_standard_id":"K-IFRS 1036","expected_paragraph_id":"104"}
+{"question":"유형자산의 감가상각은 언제 시작하나요?","answerable":true,"expected_standard_id":"K-IFRS 1016","expected_paragraph_id":"55"}
+{"question":"충당부채는 어떤 요건을 충족할 때 인식하나요?","answerable":true,"expected_standard_id":"K-IFRS 1037","expected_paragraph_id":"14"}
+{"question":"적격자산의 차입원가는 언제 자본화하나요?","answerable":true,"expected_standard_id":"K-IFRS 1023","expected_paragraph_id":"8"}
+{"question":"보고기간후 조정사건은 어떻게 회계처리하나요?","answerable":true,"expected_standard_id":"K-IFRS 1010","expected_paragraph_id":"8"}
+{"question":"무형자산 연구단계 지출은 자산으로 인식하나요?","answerable":true,"expected_standard_id":"K-IFRS 1038","expected_paragraph_id":"54"}
+{"question":"수익 기준서에서 수행의무는 어떻게 식별하나요?","answerable":true,"expected_standard_id":"K-IFRS 1115","expected_paragraph_id":"22"}
+{"question":"연결재무제표에서 지배력은 어떻게 판단하나요?","answerable":true,"expected_standard_id":"K-IFRS 1110","expected_paragraph_id":"7"}
+{"question":"공정가치의 정의는 무엇인가요?","answerable":true,"expected_standard_id":"K-IFRS 1113","expected_paragraph_id":"9"}
+{"question":"화성 탐사선의 연료 배합은 무엇인가요?","answerable":false,"expected_standard_id":null,"expected_paragraph_id":null}
