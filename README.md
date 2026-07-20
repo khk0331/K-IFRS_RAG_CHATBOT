@@ -67,6 +67,28 @@ PYTHONPATH=src python scripts/evaluate.py \
 
 `data/private/`의 PDF·추출 원문·검사 결과와 `data/index/`의 벡터 인덱스는 Git에 포함되지 않습니다.
 
+## 답변 생성 모델 연결
+
+기본 `extractive` 모드는 가장 관련도 높은 근거 원문을 그대로 반환하므로 외부 API 키가 필요하지 않습니다. OpenAI 호환 Chat Completions API를 사용하려면 다음 환경변수를 설정합니다.
+
+```bash
+KIFRS_GENERATOR=openai_compatible \
+KIFRS_LLM_BASE_URL=https://provider.example/v1 \
+KIFRS_LLM_MODEL=model-name \
+KIFRS_LLM_API_KEY=replace-me \
+uvicorn kifrs_rag.api:app --reload
+```
+
+생성 모델에는 검색된 근거마다 `E1`, `E2` 형식의 ID가 부여됩니다. 모델은 답변과 사용한 근거 ID를 JSON으로 반환해야 하며, 서버는 다음 조건을 모두 확인한 후에만 답변을 제공합니다.
+
+- 답변이 비어 있지 않음
+- 하나 이상의 근거가 지정됨
+- 모든 근거 ID가 실제 검색 결과에 존재함
+- 형식 오류가 있으면 한 번만 수정 요청
+- 재검증 실패 시 `validation_failed` 반환
+
+외부 생성 모델을 사용하면 질문과 검색된 기준서 일부가 해당 제공자에게 전송됩니다. 문서 이용 권한과 제공자의 데이터 보관·학습 정책을 확인한 후 활성화해야 합니다.
+
 ## 주요 기능
 
 - 자연어로 K-IFRS 관련 질문 입력

@@ -26,10 +26,24 @@ def get_service() -> RagService:
     else:
         raise ValueError(f"unsupported retriever: {retriever_name}")
     default_min_score = "0.86" if retriever_name == "dense" else "0.18"
+    generator_name = os.getenv("KIFRS_GENERATOR", "extractive")
+    if generator_name == "openai_compatible":
+        from .generation import OpenAICompatibleGenerator
+
+        generator = OpenAICompatibleGenerator(
+            base_url=os.environ["KIFRS_LLM_BASE_URL"],
+            model=os.environ["KIFRS_LLM_MODEL"],
+            api_key=os.getenv("KIFRS_LLM_API_KEY"),
+        )
+    elif generator_name == "extractive":
+        generator = None
+    else:
+        raise ValueError(f"unsupported generator: {generator_name}")
     return RagService(
         retriever,
         min_score=float(os.getenv("KIFRS_MIN_SCORE", default_min_score)),
         top_k=int(os.getenv("KIFRS_TOP_K", "3")),
+        generator=generator,
     )
 
 
