@@ -1,6 +1,6 @@
 import os
-from functools import lru_cache
 from pathlib import Path
+from threading import Lock
 
 from fastapi import FastAPI, HTTPException
 from fastapi import Request
@@ -17,8 +17,21 @@ class QueryRequest(BaseModel):
     question: str = Field(min_length=1, max_length=1000)
 
 
-@lru_cache
+_service: RagService | None = None
+_service_lock = Lock()
+
+
 def get_service() -> RagService:
+    global _service
+    if _service is not None:
+        return _service
+    with _service_lock:
+        if _service is None:
+            _service = _build_service()
+    return _service
+
+
+def _build_service() -> RagService:
     path = os.getenv("KIFRS_DATA_PATH", "data/sample/standards.json")
     retriever_name = os.getenv("KIFRS_RETRIEVER", "local")
     if retriever_name == "dense":

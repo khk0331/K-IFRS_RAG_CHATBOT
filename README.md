@@ -73,7 +73,17 @@ PYTHONPATH=src python scripts/evaluate.py \
   --retriever hybrid \
   --evals evals/dense_smoke.jsonl \
   --top-k 5 \
-  --min-score 0.86
+  --min-score 0.75
+```
+
+주요 기준서 질의와 무관 질문 보류를 포함한 회귀 평가:
+
+```bash
+PYTHONPATH=src python scripts/evaluate.py \
+  --retriever hybrid \
+  --evals evals/hybrid_regression.jsonl \
+  --top-k 3 \
+  --min-score 0.75
 ```
 
 `data/private/`의 PDF·추출 원문·검사 결과와 `data/index/`의 벡터 인덱스는 Git에 포함되지 않습니다.
