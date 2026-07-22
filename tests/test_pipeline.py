@@ -101,11 +101,14 @@ class PipelineTests(unittest.TestCase):
                         "needs_clarification": False,
                         "clarification_question": "",
                     }
-                return {"answer": "근거 기반 답변 【E1】", "evidence_ids": ["E1"]}
+                return {
+                    "answer": "근거 기반 답변 【E1】\n\n추가 설명 \ue200cite\ue202E1\ue202E2\ue201",
+                    "evidence_ids": ["E1"],
+                }
 
         result = OpenAIRagHarness(FakeRetriever(), FakeClient()).query("공정가치위험회피회계 설명")
         self.assertEqual(result["status"], "answered")
-        self.assertEqual(result["answer"], "근거 기반 답변")
+        self.assertEqual(result["answer"], "근거 기반 답변\n\n추가 설명")
         self.assertEqual(result["citations"][0]["paragraph_id"], "89")
 
     def test_openai_budget_guard_blocks_overspend(self):
