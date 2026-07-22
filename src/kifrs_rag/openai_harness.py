@@ -15,7 +15,10 @@ from .models import SearchResult
 
 
 LOGGER = logging.getLogger(__name__)
-EVIDENCE_MARKER = re.compile(r"\s*[【\[]E\d+[】\]]")
+EVIDENCE_MARKER = re.compile(
+    r"\s*(?:[【\[]E\d+[】\]]|\ue200cite(?:\ue202E\d+)+\ue201)",
+    re.IGNORECASE,
+)
 
 
 PLANNER_SCHEMA = {
@@ -286,6 +289,7 @@ class OpenAIRagHarness:
             )
             indices = tuple(dict.fromkeys(int(item[1:]) - 1 for item in payload["evidence_ids"]))
             clean_answer = EVIDENCE_MARKER.sub("", str(payload["answer"])).strip()
+            clean_answer = re.sub(r"\n{3,}", "\n\n", clean_answer)
             generation = GenerationResult(clean_answer, indices)
             validate_generation(generation, len(evidence_results))
             cited = [evidence_results[index] for index in generation.evidence_indices]
