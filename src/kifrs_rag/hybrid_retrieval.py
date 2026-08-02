@@ -179,21 +179,18 @@ class HybridRetriever:
         hinted_standards = {
             standard for term, standard in matched_hints if len(term) == longest_hint
         }
-        allowed = (
-            [index for index, chunk in enumerate(self.chunks) if chunk.standard_id in hinted_standards]
-            if hinted_standards
-            else None
-        )
-        dense_ranks = self._ranks(dense_scores, self.candidate_k, allowed)
-        sparse_ranks = self._ranks(sparse_scores, self.candidate_k, allowed)
+        # Earlier versions used hinted_standards as a hard routing filter. That
+        # improved obvious cases but could hide the correct paragraph when a
+        # question used overlapping terms from multiple standards. The hint is
+        # now a reranking bonus, so non-hinted standards can still compete.
+        dense_ranks = self._ranks(dense_scores, self.candidate_k)
+        sparse_ranks = self._ranks(sparse_scores, self.candidate_k)
         candidates = dense_ranks.keys() | sparse_ranks.keys()
         max_sparse = max((sparse_scores[index] for index in candidates), default=1.0) or 1.0
 
         ranked: list[tuple[float, float, int]] = []
         for index in candidates:
             chunk = self.chunks[index]
-            if hinted_standards and chunk.standard_id not in hinted_standards:
-                continue
             if (
                 chunk.paragraph_id.startswith(("BC", "IE", "IG", "IN"))
                 and "결론도출근거" not in question
@@ -257,7 +254,7 @@ class HybridRetriever:
             )
             confidence = 0.65 * float(dense_scores[index]) + 0.35 * lexical
             confidence += min(intent_bonus, 0.18)
-            if hinted_standards:
+            if hinted_standards and chunk.standard_id in hinted_standards:
                 confidence += 0.03
             elif not any(anchor in question for anchor in ACCOUNTING_ANCHORS):
                 confidence -= 0.15

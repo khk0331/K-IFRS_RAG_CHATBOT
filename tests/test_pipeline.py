@@ -65,13 +65,14 @@ class PipelineTests(unittest.TestCase):
         scores = BM25Retriever(chunks).scores("리스 사용권자산 최초인식")
         self.assertGreater(scores[0], scores[1])
 
-    def test_routes_cash_generating_unit_to_impairment_standard(self):
+    def test_cash_generating_unit_hint_is_a_bonus_not_a_hard_filter(self):
         question = "현금흐름창출단위의 손상은 어떻게 하나요?"
         matches = [(term, standard) for term, standard in STANDARD_HINTS.items() if term in question]
         longest = max(len(term) for term, _ in matches)
         routed = {standard for term, standard in matches if len(term) == longest}
         self.assertEqual(routed, {"K-IFRS 1036"})
         self.assertIn("회수가능액", expand_query(question))
+        self.assertIn("K-IFRS 1036", set(STANDARD_HINTS.values()))
 
     def test_scopes_measurement_expansion_to_the_accounting_topic(self):
         expanded = expand_query("사용권자산의 최초 인식과 후속측정은?")
